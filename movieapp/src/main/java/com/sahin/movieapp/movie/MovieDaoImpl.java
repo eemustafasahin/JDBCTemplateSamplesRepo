@@ -34,7 +34,9 @@ public class MovieDaoImpl implements MovieDao {
     public List<Movie> selectMovies()
     {
         var sql = """
-                select id,initcap(name) as name,movieapp.public.ups(name) as ups,release_date from movieapp.public.movie limit 10;
+                select id,initcap(name) as name,movieapp.public.ups(name) as ups,release_date
+                from movieapp.public.movie
+                limit 10;
                 """;
 
         return jdbcTemplate.query(sql, (rs,rows) -> {
@@ -58,14 +60,26 @@ public class MovieDaoImpl implements MovieDao {
     }
 
     @Override
-    public int deleteMovie(int id)
+    public int deleteMovie(int id) //return rows number of affected
     {
-        throw new UnsupportedOperationException("Not Implemented");
+        var sql = """
+                DELETE FROM movieapp.public.movie m where m.id = ?
+                """;
+
+        return jdbcTemplate.update(sql,id);
     }
 
     @Override
     public Optional<Movie> selectMovieById(int id)
     {
-        throw new UnsupportedOperationException("Not Implemented");
+        var sql = """
+                select id,initcap(name) as name,movieapp.public.ups(name) as ups,release_date
+                from movieapp.public.movie
+                where id = ?
+                """;
+
+        List<Movie> movies = jdbcTemplate.query(sql, new MovieRowMapper(), id);
+
+        return movies.stream().findFirst();
     }
 }
